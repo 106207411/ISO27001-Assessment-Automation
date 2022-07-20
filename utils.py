@@ -1,6 +1,5 @@
 import os
 import time
-import warnings
 import win32gui
 import win32gui
 import win32process
@@ -9,7 +8,8 @@ from win32api import GetSystemMetrics, keybd_event
 from PIL import ImageGrab
 from pywinauto import Application, mouse
 
-
+hostname = os.popen("hostname").read().strip()
+save_dir = f'./{hostname}'
 
 def wait(seconds=1):
     time.sleep(seconds)
@@ -45,10 +45,10 @@ def show_desktop():
     keybd_event(0x5B, 0, win32con.KEYEVENTF_KEYUP, 0)  # unpress left win key
 
 
-def screenshot(name, path='./screenshots/'):
+def screenshot(name, path=save_dir):
     mkdir_if_not_exist(path)
     screenshot = ImageGrab.grab()  # Take the screenshot
-    screenshot.save(path+f'{name}.png', 'PNG')
+    screenshot.save(os.path.join(path,f'{name}.png'), 'PNG')
 
 
 def mkdir_if_not_exist(path):
