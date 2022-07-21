@@ -1,9 +1,8 @@
 import os
 import time
 import win32gui
-import win32gui
-import win32process
-import win32con
+from win32process import GetWindowThreadProcessId
+from win32con import SW_MAXIMIZE, KEYEVENTF_KEYUP
 from win32api import GetSystemMetrics, keybd_event
 from PIL import ImageGrab
 from datetime import datetime
@@ -24,13 +23,13 @@ def move_window_to_center(hwnd, resize=True):
     if resize:
         win32gui.MoveWindow(hwnd, x, y, screen_width-x, screen_height-y, True)
     else:
-        win32gui.MoveWindow(hwnd, x, y, width, height, False)
+        win32gui.MoveWindow(hwnd, x, y, width, height, True)
     wait()
 
 
 def maximize_window(hwnd):
     win32gui.SetForegroundWindow(hwnd)
-    win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+    win32gui.ShowWindow(hwnd, SW_MAXIMIZE)
     wait()
 
 
@@ -39,8 +38,8 @@ def show_desktop():
     # https://blog.csdn.net/mcw_720624/article/details/116840459
     keybd_event(0x5B, 0, 0, 0)  # press left win key
     keybd_event(0x4D, 0, 0, 0)  # press M
-    keybd_event(0x4D, 0, win32con.KEYEVENTF_KEYUP, 0)  # unpress M
-    keybd_event(0x5B, 0, win32con.KEYEVENTF_KEYUP, 0)  # unpress left win key
+    keybd_event(0x4D, 0, KEYEVENTF_KEYUP, 0)  # unpress M
+    keybd_event(0x5B, 0, KEYEVENTF_KEYUP, 0)  # unpress left win key
 
 
 def get_save_dir():
@@ -62,7 +61,7 @@ def mkdir_if_not_exist(path):
 
 def get_current_hwnd_pid():
     hwnd = win32gui.GetForegroundWindow()
-    pid = win32process.GetWindowThreadProcessId(hwnd)[1]
+    pid = GetWindowThreadProcessId(hwnd)[1]
     return hwnd, pid
 
 
@@ -76,7 +75,7 @@ def call_application(commands):
 
 def snap_screen_protection():
     os.system("start rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,1")
-    wait(4)
+    wait()
     # screen_protect_raw_str = os.popen("tasklist /M desk.cpl /FI \"IMAGENAME eq rundll32.exe\" /FO \"CSV\" ").read().replace('"', '')
     # screen_protect_pid = screen_protect_raw_str.strip().split("\n")[-1].split(",")[1] if 'PID' in screen_protect_raw_str else None
     # print("螢幕保護程式 PID： ", screen_protect_pid)
