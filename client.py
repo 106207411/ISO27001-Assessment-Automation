@@ -1,21 +1,21 @@
-import os
+
 import requests
 
-class S3Client(object):
-    def __init__(self,
-                 api_url='https://el4y3cbugi.execute-api.ap-northeast-1.amazonaws.com/v1',
-                 headers={'Content-Type': 'image/png',
-                          'x-api-key': '8uy0YGL5GJ5wUJwtHGibL1ab0XzNYNdeakCrCvw5'},
-                 ):
+class S3Client():
+    def __init__(self, api_url, api_key):
         """
         :param api_url: Deployed URL of the api
-        :type api_url: str
-        :param headers: Headers to pass to requests
-        :type headers: dict
+        :param api_key: API Key
         """
         self.api_url = api_url
-        self.headers = headers
+        self.api_key = api_key
 
+    def __headers(self):
+        if self.api_key is None:
+            raise Exception('API Key not found')
+        return {'Content-Type': 'image/png',
+                'x-api-key': self.api_key}
+                 
 
     def _build_url(self, bucket_name, object_key):
         """
@@ -34,24 +34,16 @@ class S3Client(object):
         return r.status_code == 200
 
 
-    def upload_files(self, bucket_name):
+    def upload_files(self, bucket_name, object_key, data):
         """
         Upload files to S3
         """
-        img_dir = os.popen("hostname").read().strip()
+        url = self._build_url(bucket_name, object_key)
+        r = requests.put(url,
+                         data=data,
+                         headers=self.__headers())
 
-        if os.path.exists(img_dir):
-            for fname in os.listdir(img_dir):
-                if fname.endswith('.png'):
-                    fpath = os.path.join(img_dir, fname)
-                    data = open(fpath, 'rb').read()
-
-                    url = self._build_url(bucket_name, f'{img_dir}%2F{fname}')
-                    r = requests.put(url,
-                                     data=data,
-                                     headers=self.headers)
-
-                    if self._request_success(r):
-                        print(f'Successfully uploaded {fname}')
-                    else:
-                        print(f'Failed to upload {fname}')
+        if self._request_success(r):
+            print(f'Successfully uploaded {object_key}')
+        else:
+            print(f'Failed to upload {object_key}')

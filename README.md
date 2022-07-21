@@ -10,7 +10,7 @@ It measures the ISO 27001 KPI by taking screenshots of many applications as foll
 5. time sync status
 6. antivirus 
 
-The CMD with your hostname and date information is shown as background when snapping the applications. The screenshots are saved in the ‘./<your hostname>’ by default.
+The CMD with your hostname and date information is shown as background when snapping the applications. The screenshots are saved in the "./[YYYY-MM]/[yourhostname]/" by default.
 
 ## How to run
 Just right click on ISO_screenshot.exe and "Run as Administrator".

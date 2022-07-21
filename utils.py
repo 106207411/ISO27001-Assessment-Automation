@@ -7,9 +7,8 @@ import win32con
 from win32api import GetSystemMetrics, keybd_event
 from PIL import ImageGrab
 from pywinauto import Application, mouse
+from datetime import datetime
 
-hostname = os.popen("hostname").read().strip()
-save_dir = f'./{hostname}'
 
 def wait(seconds=1):
     time.sleep(seconds)
@@ -45,10 +44,16 @@ def show_desktop():
     keybd_event(0x5B, 0, win32con.KEYEVENTF_KEYUP, 0)  # unpress left win key
 
 
-def screenshot(name, path=save_dir):
+def get_save_dir():
+    hostname = os.popen("hostname").read().strip()
+    time = datetime.today().strftime('%Y-%m')
+    return os.path.join(time, hostname)
+
+
+def screenshot(name, path=get_save_dir()):
     mkdir_if_not_exist(path)
     screenshot = ImageGrab.grab()  # Take the screenshot
-    screenshot.save(os.path.join(path,f'{name}.png'), 'PNG')
+    screenshot.save(os.path.join(path, f'{name}.png'), 'PNG')
 
 
 def mkdir_if_not_exist(path):
@@ -60,6 +65,7 @@ def get_current_hwnd_pid():
     hwnd = win32gui.GetForegroundWindow()
     pid = win32process.GetWindowThreadProcessId(hwnd)[1]
     return hwnd, pid
+
 
 def call_application(commands):
     os.system(commands)
@@ -106,7 +112,6 @@ def snap_windows_update_and_time_sync():
     wait(1.5)
     screenshot("windows_update_history")
 
-
     # check the status of time sync
     setup_window.ListItem7.click_input()
     wait()
@@ -141,6 +146,18 @@ def __kill_task(pid):
     os.system(f'taskkill /F /T /PID {pid}')
     wait()
 
+
+def upload_images_to_s3(client, bucket_name, img_dir=get_save_dir()):
+    if not os.path.exists(img_dir):
+        return
+    fname_list = [fname for fname in os.listdir(img_dir) if fname.endswith('.png')]
+    for fname in fname_list:
+        fpath = os.path.join(img_dir, fname)
+        data = open(fpath, 'rb').read()
+        object_key = fpath.replace("\\", "%2F")
+        client.upload_files(bucket_name=bucket_name,
+                            object_key=object_key,
+                            data=data)
 
 # This function is deprecated
 # def find_window_by_pid(pid):

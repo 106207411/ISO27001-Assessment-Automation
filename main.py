@@ -1,4 +1,5 @@
 import utils
+from cfg import S3API
 from client import S3Client
 
 def main():
@@ -16,11 +17,10 @@ def main():
     utils.snap_antivirus()
 
     # upload screenshots to S3
-    S3Client().upload_files(bucket_name='iso-screenshot')
+    client = S3Client(api_url=S3API['api_url'], api_key=S3API['api_key'])
+    utils.upload_images_to_s3(client=client, bucket_name=S3API['bucket_name'])
 
     utils.__kill_task(cmd_pid)
-
-
 
 if __name__ == "__main__":
     main()
