@@ -6,7 +6,6 @@ import win32process
 import win32con
 from win32api import GetSystemMetrics, keybd_event
 from PIL import ImageGrab
-from pywinauto import Application, mouse
 from datetime import datetime
 
 
@@ -77,7 +76,7 @@ def call_application(commands):
 
 def snap_screen_protection():
     os.system("start rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,1")
-    wait()
+    wait(4)
     # screen_protect_raw_str = os.popen("tasklist /M desk.cpl /FI \"IMAGENAME eq rundll32.exe\" /FO \"CSV\" ").read().replace('"', '')
     # screen_protect_pid = screen_protect_raw_str.strip().split("\n")[-1].split(",")[1] if 'PID' in screen_protect_raw_str else None
     # print("螢幕保護程式 PID： ", screen_protect_pid)
@@ -94,43 +93,26 @@ def snap_appwiz():
 
 
 def snap_windows_update_and_time_sync():
-    # open windows settings
-    setup_hwnd, setup_pid = call_application('control desk.cpl')
-    maximize_window(setup_hwnd)
-    # using inspect.exe and ```setup_window.print_control_identifiers()``` to see the control identifiers of the window
-    app = Application(backend="uia").connect(handle=setup_hwnd)
-    setup_window = app.window(class_name="ApplicationFrameWindow", control_type="Window")
-
-    # click on the "Windows Update" ItemList
-    # https://github.com/pywinauto/pywinauto/issues/653
-    move_window_to_center(setup_hwnd)
-    setup_window.ListItem11.click_input()
-    wait(1.5)
+    # open windows update
+    winup_hwnd, winup_pid = call_application('start ms-settings:windowsupdate')
+    move_window_to_center(winup_hwnd)
     screenshot("windows_update")
-    # click on the "Windows Update history"
-    setup_window.child_window(auto_id="SystemSettings_MusUpdate_UpdateHistoryLink_ButtonEntityItem", control_type="Group").click_input()
-    wait(1.5)
+    # open windows update history
+    winup_hist_hwnd, winup_hist_pid = call_application('start ms-settings:windowsupdate-history')
+    wait()
     screenshot("windows_update_history")
 
-    # check the status of time sync
-    setup_window.ListItem7.click_input()
-    wait()
-    setup_window.ListItem12.click_input()
-    wait()
-
-    # scroll down the window to focus "time sync"
-    left, top, right, bottom = win32gui.GetWindowRect(win32gui.GetForegroundWindow())
-    x, y = (left+right)//2, (top+bottom)//2
-    mouse.scroll(coords=(x, y), wheel_dist=-10)
+    # open date and time
+    datetime_hwnd, datetime_pid = call_application('start ms-settings:dateandtime')
     wait()
     screenshot("time_sync")
-    __kill_task(setup_pid)
+    __kill_task(datetime_pid)
 
 
 def snap_antivirus():
     # antivirus_path = "C:\Program Files\Avast Software\Avast\AvastUI.exe"
     antivirus_path = "C:\Program Files (x86)\Trend Micro\OfficeScan Client\PccNt.exe"
-    app = Application(backend="uia").start(antivirus_path)
+    antiv_hwnd, antiv_pid = call_application(f'start "" "{antivirus_path}"')
     wait(3)
     __snap_and_kill_task("antivirus")
 
