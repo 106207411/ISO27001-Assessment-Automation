@@ -14,7 +14,7 @@ def main():
     utils.snap_windows_update_and_time_sync()
 
     # open antivirus
-    # utils.snap_antivirus()
+    utils.snap_antivirus()
 
     # upload screenshots to S3
     client = S3Client(api_url=S3API['api_url'], api_key=S3API['api_key'])

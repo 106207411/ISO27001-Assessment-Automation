@@ -66,7 +66,11 @@ def get_current_hwnd_pid():
 
 
 def call_application(commands):
-    os.system(commands)
+    """call application on windows system"""
+    result = os.system(commands)
+    if result != 0:
+        raise Exception("call application failed")
+
     wait()
     # get window handle and pid
     cmd_hwnd, cmd_pid = get_current_hwnd_pid()
@@ -109,11 +113,15 @@ def snap_windows_update_and_time_sync():
 
 
 def snap_antivirus():
-    # antivirus_path = "C:\Program Files\Avast Software\Avast\AvastUI.exe"
-    antivirus_path = "C:\Program Files (x86)\Trend Micro\OfficeScan Client\PccNt.exe"
-    antiv_hwnd, antiv_pid = call_application(f'start "" "{antivirus_path}"')
-    wait(3)
-    __snap_and_kill_task("antivirus")
+    try:
+        # antivirus_path = "C:\Program Files\Avast Software\Avast\AvastUI.exe"
+        antivirus_path = "C:\Program Files (x86)\Trend Micro\OfficeScan Client\PccNt.exe"
+        antiv_hwnd, antiv_pid = call_application(f'start "" "{antivirus_path}"')
+    except Exception as e:
+        print(e)
+    else:
+        wait(1)
+        __snap_and_kill_task("antivirus")
 
 
 def __snap_and_kill_task(task_name, task_resize=True):
