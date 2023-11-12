@@ -1,7 +1,7 @@
 # ISO27001-Assessment-Automation
 The program aims to assist ISO 27001 KPI assessment by taking screenshots of Windows applications and uploading them to AWS S3 bucket automatically.
 
-![System Architecture](./src/iso%20workflow_v2.drawio.jpg)
+![System Architecture](./img/iso%20workflow_v2.drawio.jpg)
 
 ## Usage
 ### Step1: Take Screenshots
