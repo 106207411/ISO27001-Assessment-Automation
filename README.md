@@ -35,7 +35,7 @@ The program uploads the screenshots to AWS S3 bucket. It  creates a folder named
         ...  
 ```
 
-The bucket name and api credentials are defined in `./config.py` as followings:
+The bucket name and api credentials are defined in `./src/config.py` as followings:
 ```python
 S3API = {'api_url': '',
          'api_key': '',
@@ -47,12 +47,12 @@ Just right click on ISO_screenshot.exe and "Run as Administrator".
 ## How to build exe
 ### Environment
 Using Anaconda to create a new virtual python environment is highly recommended.
-```
+```bash
 conda create -n <env_name> python=3.6
 ```
 ### Required modules
 ```bash
-pip3 install -r requirement.txt
+pip install -r requirements.txt
 ```
 ### Build exe by Pyinstaller
 
