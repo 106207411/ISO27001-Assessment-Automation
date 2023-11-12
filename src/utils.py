@@ -8,7 +8,7 @@ from PIL import ImageGrab
 from datetime import datetime
 
 
-def wait(seconds=1):
+def wait(seconds : int =1.5) -> None:
     time.sleep(seconds)
 
 
@@ -24,7 +24,7 @@ def move_window_to_center(hwnd, resize=True):
         win32gui.MoveWindow(hwnd, x, y, screen_width-x, screen_height-y, True)
     else:
         win32gui.MoveWindow(hwnd, x, y, width, height, True)
-    wait()
+    wait(1)
 
 
 def maximize_window(hwnd):
@@ -102,12 +102,12 @@ def snap_windows_update_and_time_sync():
     screenshot("windows_update")
     # open windows update history
     winup_hist_hwnd, winup_hist_pid = call_application('start ms-settings:windowsupdate-history')
-    wait()
+    wait(1)
     screenshot("windows_update_history")
 
     # open date and time
     datetime_hwnd, datetime_pid = call_application('start ms-settings:dateandtime')
-    wait()
+    wait(1)
     screenshot("time_sync")
     __kill_task(datetime_pid)
 
@@ -120,7 +120,7 @@ def snap_antivirus():
     except Exception as e:
         print(e)
     else:
-        wait(1)
+        wait(3)
         __snap_and_kill_task("antivirus")
 
 
